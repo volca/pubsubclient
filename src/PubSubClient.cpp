@@ -45,6 +45,11 @@ PubSubClient& PubSubClient::set_server(String hostname, uint16_t port) {
   return *this;
 }
 
+PubSubClient& PubSubClient::set_timeout(uint8_t t) {
+  timeout = t;
+  return *this;
+}
+
 MQTT::Message* PubSubClient::_recv_message(void) {
   MQTT::Message *msg = MQTT::readPacket(_client);
   if (msg != nullptr)
@@ -196,6 +201,14 @@ bool PubSubClient::connect(MQTT::Connect &conn) {
   lastInActivity = millis();	// Init this so that _wait_for() doesn't think we've already timed-out
   keepalive = conn.keepalive();	// Store the keepalive period from this connection
 
+  while (!_client.available()) {
+    unsigned long t = millis();
+    if (t-lastInActivity >= ((int32_t) timeout*1000UL)) {
+      _client.stop();
+      return false;
+    }
+  }
+
   if (!_send_message(conn, true)) {
     _client.stop();
     return false;
@@ -341,3 +354,5 @@ bool PubSubClient::connected() {
 
    return rc;
 }
+
+// vim600: sw=2 tabstop=2 expandtab

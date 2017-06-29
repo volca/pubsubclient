@@ -29,6 +29,7 @@ private:
    IPAddress server_ip;
    String server_hostname;
    uint16_t server_port;
+   uint8_t timeout;
    callback_t _callback;
 
    Client &_client;
@@ -93,6 +94,9 @@ public:
    PubSubClient& set_server(IPAddress &ip, uint16_t port = 1883);
    //! Set the server host name
    PubSubClient& set_server(String hostname, uint16_t port = 1883);
+
+   //! Set connect timeout in second
+   PubSubClient& PubSubClient::set_timeout(uint8_t t);
 
    //! Get the callback function
    callback_t callback(void) const { return _callback; }
