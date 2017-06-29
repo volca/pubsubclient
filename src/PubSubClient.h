@@ -96,7 +96,7 @@ public:
    PubSubClient& set_server(String hostname, uint16_t port = 1883);
 
    //! Set connect timeout in second
-   PubSubClient& PubSubClient::set_timeout(uint8_t t);
+   PubSubClient& set_timeout(uint8_t t);
 
    //! Get the callback function
    callback_t callback(void) const { return _callback; }
