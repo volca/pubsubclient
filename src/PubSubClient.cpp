@@ -201,17 +201,14 @@ bool PubSubClient::connect(MQTT::Connect &conn) {
   lastInActivity = millis();	// Init this so that _wait_for() doesn't think we've already timed-out
   keepalive = conn.keepalive();	// Store the keepalive period from this connection
 
+  _send_message(conn);
+
   while (!_client.available()) {
     unsigned long t = millis();
     if (t-lastInActivity >= ((int32_t) timeout*1000UL)) {
       _client.stop();
       return false;
     }
-  }
-
-  if (!_send_message(conn, true)) {
-    _client.stop();
-    return false;
   }
 
   return true;
