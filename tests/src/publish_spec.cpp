@@ -5,9 +5,9 @@
 #include "trace.h"
 
 
-byte server[] = { 172, 16, 0, 2 };
+IPAddress server(172, 16, 0, 2);
 
-void callback(char* topic, byte* payload, unsigned int length) {
+void callback(const MQTT::Publish& pub) {
   // handle message arrived
 }
 
@@ -19,8 +19,9 @@ int test_publish() {
     byte connack[] = { 0x20, 0x02, 0x00, 0x00 };
     shimClient.respond(connack,4);
     
-    PubSubClient client(server, 1883, callback, shimClient);
-    int rc = client.connect((char*)"client_test1");
+    PubSubClient client(shimClient, server, 1883);
+    client.set_callback(callback);
+    int rc = client.connect("client_test1");
     IS_TRUE(rc);
     
     byte publish[] = {0x30,0xe,0x0,0x5,0x74,0x6f,0x70,0x69,0x63,0x70,0x61,0x79,0x6c,0x6f,0x61,0x64};
@@ -46,8 +47,9 @@ int test_publish_bytes() {
     byte connack[] = { 0x20, 0x02, 0x00, 0x00 };
     shimClient.respond(connack,4);
     
-    PubSubClient client(server, 1883, callback, shimClient);
-    int rc = client.connect((char*)"client_test1");
+    PubSubClient client(shimClient, server, 1883);
+    client.set_callback(callback);
+    int rc = client.connect("client_test1");
     IS_TRUE(rc);
     
     byte publish[] = {0x30,0xc,0x0,0x5,0x74,0x6f,0x70,0x69,0x63,0x1,0x2,0x3,0x0,0x5};
@@ -73,8 +75,9 @@ int test_publish_retained() {
     byte connack[] = { 0x20, 0x02, 0x00, 0x00 };
     shimClient.respond(connack,4);
     
-    PubSubClient client(server, 1883, callback, shimClient);
-    int rc = client.connect((char*)"client_test1");
+    PubSubClient client(shimClient, server, 1883);
+    client.set_callback(callback);
+    int rc = client.connect("client_test1");
     IS_TRUE(rc);
     
     byte publish[] = {0x31,0xc,0x0,0x5,0x74,0x6f,0x70,0x69,0x63,0x1,0x2,0x3,0x0,0x5};
@@ -92,7 +95,7 @@ int test_publish_not_connected() {
     IT("publish fails when not connected");
     ShimClient shimClient;
     
-    PubSubClient client(server, 1883, callback, shimClient);
+    PubSubClient client(shimClient, server, 1883);
     
     int rc = client.publish((char*)"topic",(char*)"payload");
     IS_FALSE(rc);
@@ -114,8 +117,8 @@ int test_publish_P() {
     byte connack[] = { 0x20, 0x02, 0x00, 0x00 };
     shimClient.respond(connack,4);
     
-    PubSubClient client(server, 1883, callback, shimClient);
-    int rc = client.connect((char*)"client_test1");
+    PubSubClient client(shimClient, server, 1883);
+    int rc = client.connect("client_test1");
     IS_TRUE(rc);
     
     byte publish[] = {0x31,0xc,0x0,0x5,0x74,0x6f,0x70,0x69,0x63,0x1,0x2,0x3,0x0,0x5};

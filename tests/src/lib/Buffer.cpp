@@ -1,30 +1,18 @@
 #include "Buffer.h"
 #include "Arduino.h"
 
-Buffer::Buffer() {
-}
+Buffer::Buffer() :
+  _pos(0)
+{}
 
-Buffer::Buffer(uint8_t* buf, size_t size) {
-    this->add(buf,size);
-}
-bool Buffer::available() {
-    return this->pos < this->length;
-}
+int Buffer::next() {
+  if (available())
+    return _buffer[_pos++];
 
-uint8_t Buffer::next() {
-    if (this->available()) {
-        return this->buffer[this->pos++];
-    }
-    return 0;
-}
-
-void Buffer::reset() {
-    this->pos = 0;
+  return -1;
 }
 
 void Buffer::add(uint8_t* buf, size_t size) {
-    uint16_t i = 0;
-    for (;i<size;i++) {
-        this->buffer[this->length++] = buf[i];
-    }
+  for (size_t i = 0;i < size; i++)
+    _buffer += buf[i];
 }

@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "PubSubClient.h"
 #include "ShimClient.h"
 #include "Buffer.h"
@@ -5,9 +6,9 @@
 #include "trace.h"
 
 
-byte server[] = { 172, 16, 0, 2 };
+IPAddress server(172, 16, 0, 2);
 
-void callback(char* topic, byte* payload, unsigned int length) {
+void callback(const MQTT::Publish& pub) {
   // handle message arrived
 }
 
@@ -21,8 +22,9 @@ int test_keepalive_pings_idle() {
     byte connack[] = { 0x20, 0x02, 0x00, 0x00 };
     shimClient.respond(connack,4);
     
-    PubSubClient client(server, 1883, callback, shimClient);
-    int rc = client.connect((char*)"client_test1");
+    PubSubClient client(shimClient,server, 1883);
+    client.set_callback(callback);
+    int rc = client.connect("client_test1");
     IS_TRUE(rc);
     
     byte pingreq[] = { 0xC0,0x0 };
@@ -50,8 +52,9 @@ int test_keepalive_pings_with_outbound_qos0() {
     byte connack[] = { 0x20, 0x02, 0x00, 0x00 };
     shimClient.respond(connack,4);
     
-    PubSubClient client(server, 1883, callback, shimClient);
-    int rc = client.connect((char*)"client_test1");
+    PubSubClient client(shimClient,server, 1883);
+    client.set_callback(callback);
+    int rc = client.connect("client_test1");
     IS_TRUE(rc);
     
     byte publish[] = {0x30,0xe,0x0,0x5,0x74,0x6f,0x70,0x69,0x63,0x70,0x61,0x79,0x6c,0x6f,0x61,0x64};
@@ -86,8 +89,9 @@ int test_keepalive_pings_with_inbound_qos0() {
     byte connack[] = { 0x20, 0x02, 0x00, 0x00 };
     shimClient.respond(connack,4);
     
-    PubSubClient client(server, 1883, callback, shimClient);
-    int rc = client.connect((char*)"client_test1");
+    PubSubClient client(shimClient,server, 1883);
+    client.set_callback(callback);
+    int rc = client.connect("client_test1");
     IS_TRUE(rc);
     
     byte publish[] = {0x30,0xe,0x0,0x5,0x74,0x6f,0x70,0x69,0x63,0x70,0x61,0x79,0x6c,0x6f,0x61,0x64};
@@ -119,8 +123,9 @@ int test_keepalive_no_pings_inbound_qos1() {
     byte connack[] = { 0x20, 0x02, 0x00, 0x00 };
     shimClient.respond(connack,4);
     
-    PubSubClient client(server, 1883, callback, shimClient);
-    int rc = client.connect((char*)"client_test1");
+    PubSubClient client(shimClient,server, 1883);
+    client.set_callback(callback);
+    int rc = client.connect("client_test1");
     IS_TRUE(rc);
     
     byte publish[] = {0x32,0x10,0x0,0x5,0x74,0x6f,0x70,0x69,0x63,0x12,0x34,0x70,0x61,0x79,0x6c,0x6f,0x61,0x64};
@@ -147,8 +152,9 @@ int test_keepalive_disconnects_hung() {
     byte connack[] = { 0x20, 0x02, 0x00, 0x00 };
     shimClient.respond(connack,4);
     
-    PubSubClient client(server, 1883, callback, shimClient);
-    int rc = client.connect((char*)"client_test1");
+    PubSubClient client(shimClient,server, 1883);
+    client.set_callback(callback);
+    int rc = client.connect("client_test1");
     IS_TRUE(rc);
     
     byte pingreq[] = { 0xC0,0x0 };
